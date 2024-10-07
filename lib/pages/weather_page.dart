@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:weather/services/weather_service.dart';
+
+import '../models/weather_model.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
