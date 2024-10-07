@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather/services/weather_service.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -8,6 +9,24 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
+
+  final _weatherService = WeatherService('b6673125b2ece231a7eca7d87a79ab4e');
+  Weather? _weather;
+
+  _fetchWeather() async{
+    String cityName = await _weatherService.getCurrentCity();
+    try{
+      final weather = await _weatherService.getWeather(cityName);
+      setState(() {
+        _weather = weather;
+      });
+    }
+
+    catch(e){
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold();
