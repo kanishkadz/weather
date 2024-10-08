@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather/services/weather_service.dart';
-
 import '../models/weather_model.dart';
 
 class WeatherPage extends StatefulWidget {
@@ -12,39 +11,41 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-
   final _weatherService = WeatherService('b6673125b2ece231a7eca7d87a79ab4e');
   Weather? _weather;
+  bool _loading = true;
 
-  _fetchWeather() async{
+  _fetchWeather() async {
     String cityName = await _weatherService.getCurrentCity();
-    try{
+    try {
       final weather = await _weatherService.getWeather(cityName);
       setState(() {
         _weather = weather;
+        _loading = false; // Set loading to false when data is fetched
       });
-    }
-
-    catch(e){
+    } catch (e) {
       print(e);
+      setState(() {
+        _loading = false; // Set loading to false even on error
+      });
     }
   }
 
   String getWeatherAnimation(String? mainCondition) {
-    if(mainCondition == null) return 'assets/sunny.json';
-    switch(mainCondition.toLowerCase()) {
-      case 'clouds' :
-      case 'mist' :
-      case 'smoke' :
-      case 'haze' :
-      case 'dust' :
+    if (mainCondition == null) return 'assets/sunny.json';
+    switch (mainCondition.toLowerCase()) {
+      case 'clouds':
+      case 'mist':
+      case 'smoke':
+      case 'haze':
+      case 'dust':
       case 'fog':
         return 'assets/cloud.json';
       case 'rain':
-      case 'drizzle' :
-      case 'shower rain' :
+      case 'drizzle':
+      case 'shower rain':
         return 'assets/rain.json';
-      case 'thunderstrom':
+      case 'thunderstorm': // Fixed spelling here
         return 'assets/thunder.json';
       case 'clear':
         return 'assets/sunny.json';
@@ -55,7 +56,6 @@ class _WeatherPageState extends State<WeatherPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _fetchWeather();
   }
@@ -64,19 +64,18 @@ class _WeatherPageState extends State<WeatherPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
+        child: _loading // Display loading indicator while fetching
+            ? CircularProgressIndicator()
+            : Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(_weather?.cityName ?? "loading city.."),
-
+            Text(_weather?.cityName ?? "Unknown city"),
             Lottie.asset(getWeatherAnimation(_weather?.mainCondition)),
-
             Text('${_weather?.temperature.round()}°C'),
-
             Text(_weather?.mainCondition ?? ""),
           ],
         ),
-      )
+      ),
     );
   }
 }
